@@ -1,0 +1,28 @@
+VERCEL ENVIRONMENT VARIABLES — EXACT NAMES
+
+SUPABASE
+NEXT_PUBLIC_SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+
+GOOGLE SHEETS
+GOOGLE_SERVICE_ACCOUNT_EMAIL
+GOOGLE_PRIVATE_KEY
+GOOGLE_SHEETS_ID
+NEXT_PUBLIC_GOOGLE_SHEET_URL
+
+TELEGRAM
+TELEGRAM_BOT_TOKEN
+TELEGRAM_WEBHOOK_SECRET
+NEXT_PUBLIC_TELEGRAM_BOT_URL
+
+GITHUB PUBLIC LINK
+NEXT_PUBLIC_GITHUB_URL
+
+IMPORTANT
+1. Add these in Vercel -> Project -> Environment Variables.
+2. Enable Production for all of them.
+3. After adding/changing variables, Redeploy.
+4. Do NOT put secret values into GitHub.
+5. Supabase URL must be:
+   https://xxxxx.supabase.co
+   NOT https://xxxxx.supabase.co/rest/v1/

@@ -1,0 +1,18 @@
+PERSONALIZED PROJECT DETAILS
+
+Student name:
+Denis Shuvayev
+
+Git author name:
+Denis Shuvayev
+
+Git author email:
+denisshuvayev48@gmail.com
+
+GitHub repository:
+https://github.com/QAZAQ7/DS4.git
+
+These details are already built into:
+2_UPLOAD_TO_GITHUB_WINDOWS.bat
+
+You do NOT need to type git config commands manually.
