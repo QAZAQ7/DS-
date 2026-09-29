@@ -53,8 +53,28 @@ function googleClient(){
   const email=process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const rawKey=process.env.GOOGLE_PRIVATE_KEY;
   if(!email || !rawKey) throw new Error("Google Sheets credentials are missing.");
-  const key=rawKey.replace(/\\n/g,"\n");
-  const auth=new google.auth.JWT({email,key,scopes:["https://www.googleapis.com/auth/spreadsheets"]});
+
+  let key=rawKey.trim();
+
+  // Vercel may store the JSON private key with quotes or literal \\n sequences.
+  if(
+    (key.startsWith('"') && key.endsWith('"')) ||
+    (key.startsWith("'") && key.endsWith("'"))
+  ){
+    key=key.slice(1,-1);
+  }
+
+  key=key.replace(/\\n/g,"\n").replace(/\r\n/g,"\n");
+
+  if(!key.includes("-----BEGIN PRIVATE KEY-----") || !key.includes("-----END PRIVATE KEY-----")){
+    throw new Error("GOOGLE_PRIVATE_KEY format is invalid.");
+  }
+
+  const auth=new google.auth.JWT({
+    email:email.trim(),
+    key,
+    scopes:["https://www.googleapis.com/auth/spreadsheets"]
+  });
   return google.sheets({version:"v4",auth});
 }
 
@@ -115,7 +135,8 @@ async function syncRecord(kind:"sale"|"expense",row:any){
     if(kind==="sale") await syncSale(row); else await syncExpense(row);
     await db.from(kind==="sale"?"sales":"expenses").update({sheet_sync_status:"ok"}).eq("id",row.id);
     return "ok";
-  }catch{
+  }catch(e:any){
+    console.error("SHEETS_SYNC_ERROR", e?.response?.data || e?.message || e);
     await db.from(kind==="sale"?"sales":"expenses").update({sheet_sync_status:"failed"}).eq("id",row.id);
     return "failed";
   }
