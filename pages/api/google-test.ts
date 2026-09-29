@@ -36,7 +36,7 @@ export default async function handler(
     key = key.replace(/\\n/g, "\n");
 
     const auth = new google.auth.JWT({
-      email,
+      email: email.trim().replace(/\\@/g, "@"),
       key,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
