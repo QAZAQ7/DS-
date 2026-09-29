@@ -71,7 +71,7 @@ function googleClient(){
   }
 
   const auth=new google.auth.JWT({
-    email:email.trim(),
+    email:email.trim().replace(/\\@/g,"@"),
     key,
     scopes:["https://www.googleapis.com/auth/spreadsheets"]
   });
