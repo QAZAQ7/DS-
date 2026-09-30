@@ -68,19 +68,16 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
     if(!msg?.from?.id || !msg?.chat?.id || !msg?.text) return res.status(200).json({ok:true});
 
     const database=db();
+    const {data:emp}=await database.from("employees").select("*").eq("telegram_user_id",msg.from.id).single();
+    if(!emp){
+      await send(msg.chat.id,"Your Telegram account is not linked. Ask the manager to link your Telegram user ID first.");
+      return res.status(200).json({ok:true});
+    }
+
+    await database.from("employees").update({telegram_chat_id:msg.chat.id}).eq("id",emp.id);
     const text=String(msg.text).trim();
-    const {data:emp}=await database.from("employees").select("*").eq("telegram_user_id",msg.from.id).maybeSingle();
 
     if(text==="/start"){
-      if(!emp){
-        await send(msg.chat.id,
-`Friends Included bot ready, but this Telegram account is not linked yet.
-Telegram user ID: ${msg.from.id}
-Telegram chat ID: ${msg.chat.id}
-Ask the manager to link these IDs to a fictional employee. This command does not assign a role.`);
-        return res.status(200).json({ok:true});
-      }
-      await database.from("employees").update({telegram_chat_id:msg.chat.id}).eq("id",emp.id);
       await send(msg.chat.id,
 `Friends Included bot ready.
 
@@ -91,13 +88,6 @@ EXPENSE:
 /expense | REF | Description | Materials/Travel/Other | Amount | A/B/Company overhead`);
       return res.status(200).json({ok:true});
     }
-
-    if(!emp){
-      await send(msg.chat.id,"Your Telegram account is not linked. Send /start to see your Telegram user ID and chat ID, then ask the manager to link them.");
-      return res.status(200).json({ok:true});
-    }
-
-    await database.from("employees").update({telegram_chat_id:msg.chat.id}).eq("id",emp.id);
 
     if(text.startsWith("/sale")){
       if(emp.role!=="salesperson"){ await send(msg.chat.id,"Permission denied: only salespeople can submit sales."); return res.status(200).json({ok:true}); }
